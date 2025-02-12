@@ -100,6 +100,8 @@ public class WifiWizard2 extends CordovaPlugin {
   private static final int WIFI_SERVICE_INFO_CODE = 3;
   private static final String ACCESS_FINE_LOCATION =
       android.Manifest.permission.ACCESS_FINE_LOCATION;
+  private static final String NEARBY_WIFI_DEVICES =
+      android.Manifest.permission.NEARBY_WIFI_DEVICES;
 
   private static int LAST_NET_ID = -1;
   // This is for when SSID or BSSID is requested but permissions have not been granted for location
@@ -1179,6 +1181,11 @@ public class WifiWizard2 extends CordovaPlugin {
    * @return true if SSID found, false if not.
    */
   private boolean getWifiServiceInfo(CallbackContext callbackContext, boolean basicIdentifier) {
+    if (API_VERSION >= 33 && !cordova.hasPermission(NEARBY_WIFI_DEVICES)) {
+        cordova.requestPermission(this, LOCATION_REQUEST_CODE, android.Manifest.permission.NEARBY_WIFI_DEVICES);
+        return true;
+    }
+
     if (API_VERSION >= 23
         && !cordova.hasPermission(ACCESS_FINE_LOCATION)) { // Android 9 (Pie) or newer
       requestLocationPermission(WIFI_SERVICE_INFO_CODE);
